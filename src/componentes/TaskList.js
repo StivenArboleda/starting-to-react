@@ -9,19 +9,35 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Task from './Task';
 import TaskForm from './TaskForm';
-import axios from '../config/axios'
+//import axios from '../config/axios'
+import firebase from '../config/firebase'
+import { getFirestore, collection, getDocs } from 'firebase/firestore'
 
 function Boton({ owner }) {
   const [taskList, setTaskList] = useState([]);
   const [taskEdit, setTaskEdit] = useState({})
+  const firebaseDB = getFirestore(firebase)
 
   useEffect(() => {
-    axios.get("todos?_start=100&_limit=10")
-        .then((res) => 
-        //console.log(res)
-        setTaskList(res.data)
-      )
+//    axios.get("todos?_start=100&_limit=10")
+//       .then((res) => 
+//        //console.log(res)
+//        setTaskList(res.data)
+//      )
+
+getTodos(firebaseDB)
+    .then( (res) => setTaskList(res))
+
   }, [])
+
+
+  const getTodos = async (db) => {
+    const todosCol = collection(db, 'todos')
+    const todosCursor = await getDocs(todosCol)
+    const todoList = todosCursor.docs.map(doc => doc.data())
+
+    return todoList
+  }
 
   const addTask = (task) => {
     let tasks = [...taskList]
