@@ -11,7 +11,7 @@ import Task from './Task';
 import TaskForm from './TaskForm';
 //import axios from '../config/axios'
 import firebase from '../config/firebase'
-import { getFirestore, collection, getDocs } from 'firebase/firestore'
+import { getFirestore, collection, getDocs, setDoc, doc } from 'firebase/firestore'
 
 function Boton({ owner }) {
   const [taskList, setTaskList] = useState([]);
@@ -42,18 +42,22 @@ getTodos(firebaseDB)
   const addTask = (task) => {
     let tasks = [...taskList]
 
-    if(!task.id){
-
+    if(!task.id)
       task.id = Math.floor(Math.random()*10000)
-      tasks.push(task)
+    setDoc(doc(firebaseDB, "todos", task.id+""), task)
+          .then( () => {
+            getTodos(firebaseDB)
+              .then( (res) => setTaskList(res))
+          })
+  //    tasks.push(task)
 
-    }else{
-      let index = tasks.findIndex( taskItem => taskItem.id === task.id)
-      tasks[index] = task
-      setTaskEdit({})
-    }
+  //  }else{
+  //    let index = tasks.findIndex( taskItem => taskItem.id === task.id)
+  //    tasks[index] = task
+  //    setTaskEdit({})
+    
     //tasks.push(task)
-    setTaskList(tasks)
+    //setTaskList(tasks)
   }
   const delTask = (task) => {
     let tasks = [...taskList]
